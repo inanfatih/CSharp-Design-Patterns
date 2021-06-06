@@ -109,18 +109,38 @@ namespace Design_Patterns
 
     public class AndSpecification<T> : ISpecification<T>
     {
-        ISpecification<T> first, second;
+        //ISpecification<T> first, second;
+        ISpecification<T>[] specs;
 
-        public AndSpecification(ISpecification<T> first, ISpecification<T> second)
+        //public AndSpecification(ISpecification<T> first, ISpecification<T> second)
+        //{
+        //    this.first = first ?? throw new ArgumentNullException(nameof(first));
+        //    this.second = second ?? throw new ArgumentNullException(nameof(second));
+        //}
+
+        public AndSpecification(ISpecification<T>[] specs)
         {
-            this.first = first ?? throw new ArgumentNullException(nameof(first));
-            this.second = second ?? throw new ArgumentNullException(nameof(second));
+            this.specs = specs;
         }
 
         public bool IsSatisfied(T t)
         {
-            return first.IsSatisfied(t) && second.IsSatisfied(t);
+            bool satisfied = true;
+            foreach (var spec in specs)
+            {
+                satisfied = satisfied && spec.IsSatisfied(t);
+                if (!satisfied)
+                {
+                    break;
+                }
+            }
+            return satisfied;
         }
+
+        //public bool IsSatisfied(T t)
+        //{
+        //    return first.IsSatisfied(t) && second.IsSatisfied(t);
+        //}
     }
 
     public class BetterFilter : IFilter<Product>
@@ -168,8 +188,15 @@ namespace Design_Patterns
                 Console.WriteLine($" - {p.Name} is huge");
             }
 
-            Console.WriteLine("Large Blue Products (new):");
-            foreach (var p in bf.Filter(products, new AndSpecification<Product>(new ColorSpecification(Color.Blue), new SizeSpecification(Size.Large))))
+            //Console.WriteLine("Large Blue Products (new):");
+            //foreach (var p in bf.Filter(products, new AndSpecification<Product>(new ColorSpecification(Color.Blue), new SizeSpecification(Size.Large))))
+            //{
+            //    Console.WriteLine($" - {p.Name} is Large and Blue");
+            //}
+
+            Console.WriteLine("Large and Blue products with AndSpecification array");
+            ISpecification<Product>[] specifications = { new ColorSpecification(Color.Blue), new SizeSpecification(Size.Large) };
+            foreach (var p in bf.Filter(products, new AndSpecification<Product>(specifications)))
             {
                 Console.WriteLine($" - {p.Name} is Large and Blue");
             }
